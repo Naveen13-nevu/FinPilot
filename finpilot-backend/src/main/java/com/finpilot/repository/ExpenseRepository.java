@@ -25,6 +25,13 @@ public interface ExpenseRepository extends JpaRepository<Expense, UUID>, JpaSpec
                                      @Param("startDate") LocalDate startDate,
                                      @Param("endDate") LocalDate endDate);
 
+    @Query("SELECT COALESCE(SUM(e.amount), 0) FROM Expense e WHERE e.user = :user " +
+            "AND e.category.id = :categoryId AND e.transactionDate BETWEEN :startDate AND :endDate")
+    BigDecimal sumByUserAndCategoryAndDateRange(@Param("user") User user,
+                                                @Param("categoryId") UUID categoryId,
+                                                @Param("startDate") LocalDate startDate,
+                                                @Param("endDate") LocalDate endDate);
+
     @Query("SELECT FUNCTION('TO_CHAR', e.transactionDate, 'YYYY-MM'), COALESCE(SUM(e.amount), 0) " +
             "FROM Expense e WHERE e.user = :user AND e.transactionDate BETWEEN :startDate AND :endDate " +
             "GROUP BY FUNCTION('TO_CHAR', e.transactionDate, 'YYYY-MM') " +
